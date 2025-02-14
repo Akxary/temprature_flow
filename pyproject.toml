@@ -1,0 +1,52 @@
+[tool.poetry]
+package-mode = false
+name = "temprature-flow"
+version = "0.1.0"
+description = "Measurement temperature by socker flow"
+authors = ["Akxary <pollxx97@gmail.com>"]
+license = "Papashe"
+readme = "README.md"
+
+[tool.pytest.ini_options]
+log_level = "DEBUG"
+log_format = "%(asctime)s - %(module)s:%(lineno)d - [%(levelname)s] - %(message)s"
+log_date_format = "%Y-%m-%d %H:%M:%S"
+testpaths = ["tests"]
+pythonpath = [
+    "."
+]
+filterwarnings = [
+    "ignore::DeprecationWarning"
+]
+# Указываем, где искать тестовые классы
+python_classes = [
+    "Test*",
+    "*Test"
+]
+# Указываем, где искать тестовые функции
+python_functions = [
+    "test_*",
+    "*_test"
+]
+
+[tool.mypy]
+strict = true
+
+[tool.poetry.dependencies]
+python = "^3.11"
+ttkbootstrap = "^1.10.1"
+pandas = "^2.2.3"
+scipy = "^1.15.1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.4"
+mypy = "^1.13.0"
+black = {extras = ["jupyter"], version = "^24.4.2"}
+pyright = "^1.1.368"
+scipy-stubs = "^1.15.1.0"
+pandas-stubs = "^2.2.3.241126"
+pytest-mypy = "^0.10.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
