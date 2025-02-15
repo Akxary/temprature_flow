@@ -1,11 +1,12 @@
-from calendar import c
-import copy
-from typing import Literal, List, cast
+from typing import Literal, cast
 import numpy.typing as npt
+from scipy.optimize import minimize
 from scipy.stats import t
 import numpy as np
 import math
-from math import pow, sqrt, exp
+from math import pow
+
+from core.formater_util import format_error_list
 
 
 c_1 = 2 * math.pi * 6.62607015 * pow(2.99792458, 2) * pow(10, 12)
@@ -28,7 +29,7 @@ class SpecContainer:
         if self.wave_lengths.mean() // 100 > 1:
             self.wave_lengths /= 1000
         self.model = model
-        self._base_spec = calib_spec[:, 1]
+        self._base_spec = calib_spec[:, 1].astype(np.float64)
         self.calib_signal = (
             self._base_spec / self.lbb(calib_temp) / self.eps_val(calib_eps)
         )
@@ -57,7 +58,7 @@ class SpecContainer:
     def set_spec(self, signals: npt.NDArray[np.float64]) -> None:
         if signals.ndim != 1 or signals.shape[0] != self.wave_lengths.shape[0]:
             raise ValueError("Incorrect input signal")
-        self.signals = signals / self.calib_signal
+        self.signals = signals.astype(np.float64) / self.calib_signal
 
     def set_model(
         self,
@@ -104,7 +105,6 @@ class Calculator:
         """To find eps_arr, not for covariance matrix"""
         return np.array(
             [
-                # [self.l_b_b(temp, w_l, self._type) * pow(w_l, j) for j in self.model]
                 self.container.lbb(temp) * np.power(self.container.wave_lengths, j)
                 for j in self.model
             ]
@@ -171,3 +171,14 @@ class Calculator:
                 2,
             )
         ))
+
+
+def calculate_temp_with_errors(spec_container: SpecContainer)->tuple[list[float], list[float]]:
+    calculator = Calculator(spec_container)
+    t_vin = spec_container.estimate_vin()
+    t_0 = float(minimize(calculator.s2, t_vin, method="Nelder-Mead").x[0]) # type: ignore
+    eps = calculator.eps_arr(t_0)
+    ans_arr = [t_0]+list(eps)
+    cov: list[float] = list(calculator.cov_matrix(t_0))
+    ans_arr, cov = format_error_list(ans_arr, cov)
+    return ans_arr, cov
