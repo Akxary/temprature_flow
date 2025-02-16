@@ -7,7 +7,7 @@ from scipy.optimize import minimize
 import logging
 
 from core.calculation_module import SpecContainer, calculate_temp_with_errors
-from core.formater_util import format_error_list
+from core.utils.formater_util import format_error_list
 logger = logging.getLogger(__name__)
 
 class DataAdapter:

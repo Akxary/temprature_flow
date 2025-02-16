@@ -37,6 +37,8 @@ python = "^3.11"
 ttkbootstrap = "^1.10.1"
 pandas = "^2.2.3"
 scipy = "^1.15.1"
+customtkinter = "^5.2.2"
+matplotlib = "^3.10.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.4"
@@ -46,6 +48,7 @@ pyright = "^1.1.368"
 scipy-stubs = "^1.15.1.0"
 pandas-stubs = "^2.2.3.241126"
 pytest-mypy = "^0.10.3"
+matplotlib-stubs = "^0.2.0"
 
 [build-system]
 requires = ["poetry-core"]
