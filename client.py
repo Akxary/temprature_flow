@@ -21,8 +21,8 @@ if __name__ == "__main__":
     HOST = "127.0.0.1"
     PORT = 8585
     # path = Path(r"D:\YandexDisk\Актуал\SC_UI\2025-02-12_spiral_lamp\u_2.199_exp_16.704_4_400_1120_14765_1.csv")
-    path = Path(r"D:\YandexDisk\Актуал\SC_UI\2025-02-12_spiral_lamp\u_4.499_exp_16.704_4_400_1120_14765_0.csv")
-    # path = Path(r"D:\YandexDisk\Актуал\SC_UI\2025-02-12_spiral_lamp\u_6.499_exp_16.704_4_400_1120_14765_0.csv")
+    # path = Path(r"D:\YandexDisk\Актуал\SC_UI\2025-02-12_spiral_lamp\u_4.499_exp_16.704_4_400_1120_14765_0.csv")
+    path = Path(r"D:\YandexDisk\Актуал\SC_UI\2025-02-12_spiral_lamp\u_6.499_exp_16.704_4_400_1120_14765_0.csv")
     signals = pd.read_csv(path, skiprows=1, header=None, decimal=",")[[5]].to_numpy()
     #[1, 2, 3, 4, 5]
     send_signal(HOST, PORT, [*signals])
