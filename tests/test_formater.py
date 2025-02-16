@@ -1,4 +1,4 @@
-from core.formater_util import format_value_by_error
+from core.utils.formater_util import format_value_by_error
 import pytest
 
 

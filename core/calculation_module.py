@@ -6,7 +6,7 @@ import numpy as np
 import math
 from math import pow
 
-from core.formater_util import format_error_list
+from core.utils.formater_util import format_error_list
 
 
 c_1 = 2 * math.pi * 6.62607015 * pow(2.99792458, 2) * pow(10, 12)
