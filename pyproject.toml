@@ -31,6 +31,7 @@ python_functions = [
 
 [tool.mypy]
 strict = true
+exclude = ["build/"]
 
 [tool.poetry.dependencies]
 python = "^3.11"
