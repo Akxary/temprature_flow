@@ -7,6 +7,7 @@ from tkinter import filedialog
 from cycler import V
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk # type: ignore
 from matplotlib.figure import Figure
+from matplotlib.dates import DateFormatter
 import numpy as np
 
 from core.calculation_module import SpecContainer
@@ -33,13 +34,12 @@ class App(
         super().__init__()
         # background thread
         self.server_thread: Thread = Thread(daemon=True)
-        self.stop_event = Event()
         # result array
-        self.time_arr: list[str] = []
+        self.time_arr: list[datetime] = []
         self.temp_arr: list[float] = []  # [2000.0]
         self.temp_err_arr: list[float] = []  # [2.0]
         # variables
-        self.exp_var = ctk.DoubleVar(value=1.0)
+        self.exp_var = ctk.DoubleVar(value=16.23)
         self.temp_var = ctk.DoubleVar(value=2200.0)
         self.e0_var = ctk.DoubleVar(value=0.5)
         self.e1_var = ctk.DoubleVar(value=0.0)
@@ -53,9 +53,16 @@ class App(
         # self.geometry("950x550")
         self.spec_container: SpecContainer
         self.left_frame = ctk.CTkFrame(self)
-        self.left_frame.grid(row=0, column=0, sticky="ns", padx=10)
         self.right_frame = ctk.CTkFrame(self)
-        self.right_frame.grid(row=0, column=1, sticky="ns", padx=10)
+        self.grid_rowconfigure(0, weight=1)  # Вес для строки
+        self.grid_columnconfigure(0, weight=1)  # Вес для первого столбца
+        self.grid_columnconfigure(1, weight=1)  # Вес для второго столбца
+        self.left_frame.grid(row=0, column=0, sticky="nsew", padx=10)
+        self.right_frame.grid(row=0, column=1, sticky="nsew", padx=10)
+        for i in range(3):
+            self.left_frame.grid_rowconfigure(i, weight=1)
+        for i in range(9):
+            self.left_frame.grid_columnconfigure(i, weight=1)
 
         self.text_box = ctk.CTkTextbox(self.right_frame, width=600, height=150)
         self.logger = logging.getLogger("AppLogger")
@@ -157,7 +164,9 @@ class App(
         """Обновление графика."""
         self.logger.info("Updating plot")
         self.plot.clear()
-        self.plot.errorbar(self.time_arr, self.temp_arr, self.temp_err_arr, marker="o")
+        self.plot.errorbar(np.array(self.time_arr), self.temp_arr, self.temp_err_arr, marker="o")
+        # self.plot.set_xticklabels(self.plot.get_xticks)
+        self.plot.xaxis.set_major_formatter(DateFormatter('%H:%M:%S'))
         self.plot.set_xlabel("Текущее время")
         self.plot.set_ylabel("Температура, К")
         self.canvas.draw()        

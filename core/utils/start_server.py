@@ -1,6 +1,6 @@
 from datetime import datetime
 from socket import socket, AF_INET, SOCK_STREAM, timeout
-from threading import Thread
+from threading import Lock, Thread
 
 import numpy as np
 
@@ -41,9 +41,8 @@ class StartServerMixin(
         # Максимальное количество ожидающих соединений
         server_socket.listen(5)
         self.logger.info("Server listening %s:%s", host, port)
-        self.stop_event.clear()
 
-        while not self.stop_event.is_set():
+        while True:
             try:
                 server_socket.settimeout(1.0)
                 # Принятие соединения от клиента
@@ -64,9 +63,10 @@ class StartServerMixin(
                     )
                     # Вычисление температуры
                     signals = np.where(signals <= 0, np.ones(signals.shape), signals)
-                    self.container.set_spec(signals)
-                    res, res_err = calculate_temp_with_errors(self.container)
-                    self.time_arr.append(datetime.now().strftime("%H:%M:%S"))
+                    with Lock():
+                        self.container.set_spec(signals)
+                        res, res_err = calculate_temp_with_errors(self.container)
+                    self.time_arr.append(datetime.now())
                     self.temp_arr.append(res[0])
                     self.temp_err_arr.append(res_err[0])
                     # обновление результирующей переменной

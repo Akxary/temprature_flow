@@ -1,6 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
 import logging
-from threading import Event, Thread
+from threading import Thread
 from typing import Protocol
 
 from customtkinter import CTkTextbox, BooleanVar, DoubleVar, StringVar # type: ignore
@@ -42,10 +43,9 @@ class ThreadPoolProtocol(Protocol):
 
 class StopEventProtocol(Protocol):
     server_thread: Thread
-    stop_event: Event
 
 class ResContainerProtocol(Protocol):
-    time_arr: list[str]
+    time_arr: list[datetime]
     temp_arr: list[float]
     temp_err_arr: list[float] 
     res_var: StringVar
