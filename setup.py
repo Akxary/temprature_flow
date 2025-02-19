@@ -1,4 +1,4 @@
-from cx_Freeze import setup, Executable
+from cx_Freeze import setup, Executable # type: ignore
 
 
 # Указываем пакеты, которые нужно включить
@@ -18,21 +18,6 @@ build_options = {
         "pytest-mypy",
         "matplotlib-stubs",
         "cx-freeze",
-        # "scipy.linalg",
-        "scipy.fft",
-        "scipy.signal",
-        # "scipy.sparse",
-        "scipy.integrate",
-        "scipy.io",
-        "scipy.interpolate",
-        "scipy.ndimage",
-        "scipy.special",
-        "scipy.cluster",
-        "scipy.constants",
-        "scipy.misc",
-        "scipy.odr",
-        "scipy.spatial",
-        "scipy.weave",
     ],  # Пакеты, которые нужно исключить
     "include_files": ["config.json"],  # Внешние файлы (например, изображения, конфиги)
 }

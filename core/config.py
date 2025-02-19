@@ -1,8 +1,12 @@
 from dataclasses import dataclass
 import json
 from pathlib import Path
+import sys
 
-config_path = Path(__name__).parent / "config.json"
+if getattr(sys, "frozen", False):
+    config_path = Path(sys.executable).parent / "config.json"
+else:
+    config_path = Path(__name__).parent / "config.json"
 config_dict = json.loads(config_path.read_text(encoding="utf-8"))
 
 @dataclass(frozen=True)
