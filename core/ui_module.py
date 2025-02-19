@@ -50,7 +50,7 @@ class App(
         
         
         self.title("Temperature measumrement flow")
-        self.geometry("950x550")
+        # self.geometry("950x550")
         self.spec_container: SpecContainer
         self.left_frame = ctk.CTkFrame(self)
         self.left_frame.grid(row=0, column=0, sticky="ns", padx=10)
