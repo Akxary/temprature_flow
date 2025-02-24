@@ -51,7 +51,7 @@ class App(
         
         self.title("Temperature measumrement flow")
         # self.geometry("950x550")
-        self.spec_container: SpecContainer
+        self.container: SpecContainer
         self.left_frame = ctk.CTkFrame(self)
         self.right_frame = ctk.CTkFrame(self)
         self.grid_rowconfigure(0, weight=1)  # Вес для строки
@@ -61,10 +61,10 @@ class App(
         self.right_frame.grid(row=0, column=1, sticky="nsew", padx=10)
         for i in range(3):
             self.left_frame.grid_rowconfigure(i, weight=1)
-        for i in range(9):
+        for i in range(10):
             self.left_frame.grid_columnconfigure(i, weight=1)
 
-        self.text_box = ctk.CTkTextbox(self.right_frame, width=600, height=150)
+        self.text_box = ctk.CTkTextbox(self.right_frame, width=600, height=350)
         self.logger = logging.getLogger("AppLogger")
         self.setup_logger()
 
@@ -139,18 +139,27 @@ class App(
         res_temp_label.grid(row=7, columnspan=3, column=0, pady=10, padx=5)
         self.res_temp_entry.grid(row=8, columnspan=3, column=0, pady=10, padx=5)
 
-        # 5. График
+        # 5. График текущей температуры
         self.fig_frame = ctk.CTkFrame(self.right_frame, width=650, height=600)
         self.fig_frame.pack(expand=True)
         # Добавляем панель инструментов для масштабирования и панорамирования
-        self.figure = Figure(figsize=(7, 4), dpi=100)
+        self.figure = Figure(figsize=(9, 5), dpi=100)
         self.plot = self.figure.add_subplot(111)
         self.canvas = FigureCanvasTkAgg(self.figure, master=self.fig_frame)
         self.toolbar = NavigationToolbar2Tk(self.canvas, self.fig_frame)
         self.toolbar.update()
         self.canvas.get_tk_widget().pack(pady=10, padx=5)
-        # Инициализация графика
-        self.update_plot()
+        # График текущего спектра
+        self.spec_fig_frame = ctk.CTkFrame(self.left_frame, width=350, height=300)
+        self.spec_fig_frame.grid(row=9, columnspan=3, column=0, pady=10, padx=5)
+        self.spec_figure = Figure(figsize=(4, 3), dpi=100)
+        self.spec_plot = self.spec_figure.add_subplot(111)
+        self.spec_canvas = FigureCanvasTkAgg(self.spec_figure, master=self.spec_fig_frame)
+        self.spec_toolbar = NavigationToolbar2Tk(self.spec_canvas, self.spec_fig_frame)
+        self.spec_toolbar.update()
+        self.spec_canvas.get_tk_widget().pack(pady=10, padx=5)
+        # Инициализация графиков
+        # self.update_plot()
         # 6. Прокручиваемый текстовый бокс для логов
         self.text_box.pack(pady=10, padx=5)
 
@@ -162,12 +171,22 @@ class App(
 
     def update_plot(self) -> None:
         """Обновление графика."""
-        self.logger.info("Updating plot")
+        self.logger.info("Updating temperature plot")
         self.plot.clear()
         self.plot.errorbar(np.array(self.time_arr), self.temp_arr, self.temp_err_arr, marker="o")
-        # self.plot.set_xticklabels(self.plot.get_xticks)
         self.plot.xaxis.set_major_formatter(DateFormatter('%H:%M:%S'))
         self.plot.set_xlabel("Текущее время")
         self.plot.set_ylabel("Температура, К")
-        self.canvas.draw()        
+        self.canvas.draw()  
+        # spec plot
+        self.logger.info("Updating spec plot")
+        _, eps_arr = self.get_model()
+        self.spec_plot.clear()
+        self.spec_plot.plot(self.container.wave_lengths, self.container.signals, linewidth=0, marker="p", markersize=3, label="signal")
+        self.spec_plot.plot(self.container.wave_lengths, self.container.eps_val(eps_arr)*self.container.lbb(self.temp_var.get()), linewidth=3, linestyle="--", label="model")
+        self.spec_plot.ticklabel_format(axis="y", useMathText=True)
+        self.spec_plot.set_ylabel("I", loc="top", rotation=0, labelpad=-5)
+        self.spec_plot.set_xlabel(r"$\lambda,\ \mu m$", loc="right", labelpad=-35)
+        self.spec_plot.legend()
+        self.spec_canvas.draw()        
         
