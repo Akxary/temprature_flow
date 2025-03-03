@@ -8,7 +8,7 @@ def test_recieve_signal()->None:
     expected = [float(x) for x in input_nums]
     size = len(input_nums)
     binary_size = struct.pack('!I', size)
-    binary_nums = struct.pack(f'!{size}i', *input_nums)
+    binary_nums = struct.pack(f'@{size}i', *input_nums)
     mock_socket = Mock()
     mock_socket.recv.side_effect = [
         binary_size,
