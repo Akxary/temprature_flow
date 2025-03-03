@@ -4,9 +4,11 @@ from pathlib import Path
 import sys
 
 if getattr(sys, "frozen", False):
-    config_path = Path(sys.executable).parent / "config.json"
+    base_path = Path(sys.executable).parent
 else:
-    config_path = Path(__name__).parent / "config.json"
+    base_path = Path(__name__).parent
+    
+config_path = base_path / "config.json"
 config_dict = json.loads(config_path.read_text(encoding="utf-8"))
 
 @dataclass(frozen=True)

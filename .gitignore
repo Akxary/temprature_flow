@@ -11,6 +11,7 @@ poetry.lock
 # Distribution / packaging
 .Python
 build/
+specs/
 develop-eggs/
 dist/
 downloads/

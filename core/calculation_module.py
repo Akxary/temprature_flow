@@ -14,7 +14,7 @@ c_2 = 6.62607015 * 2.99792458 / 1.38 * pow(10, 3)
 
 
 class SpecContainer:
-
+    bkg = np.zeros((1,))
     def __init__(
         self,
         calib_spec: npt.NDArray[np.float64],
@@ -34,6 +34,8 @@ class SpecContainer:
             self._base_spec / self.lbb(calib_temp) / self.eps_val(calib_eps)
         )
         self.signals = np.ones(self.calib_signal.shape)
+        if self.bkg.shape[0] != self.signals.shape[0]:
+            self.set_bkg(np.zeros((self.signals.shape[0],2)))
 
     def eps_val(
         self,
@@ -58,7 +60,12 @@ class SpecContainer:
     def set_spec(self, signals: npt.NDArray[np.float64]) -> None:
         if signals.ndim != 1 or signals.shape[0] != self.wave_lengths.shape[0]:
             raise ValueError("Incorrect input signal")
-        self.signals = signals.astype(np.float64) / self.calib_signal
+        self.signals = (signals.astype(np.float64) - self.bkg) / self.calib_signal
+    
+    def set_bkg(self, bkg: npt.NDArray[np.float64]) -> None:
+        if bkg.ndim != 2 or bkg.shape[0] != self.wave_lengths.shape[0]:
+            raise ValueError("Incorrect input background")
+        self.bkg = bkg[:, 1].astype(np.float64)
 
     def set_model(
         self,
@@ -73,11 +80,7 @@ class SpecContainer:
         )
         self.signals /= self.calib_signal
 
-    def estimate_vin(self) -> float:
-        y = np.log(self.signals * np.power(self.wave_lengths, 5) / c_1)
-        x = c_2 / self.wave_lengths
-        a, _ = np.polyfit(x, y, deg=1)
-        return float(-1 / a)
+    
 
 
 class Calculator:
@@ -101,6 +104,12 @@ class Calculator:
             ))
         self.w_mat = np.diagflat(self.w)
 
+    def estimate_vin(self) -> float:
+        y = np.log(self.container.signals * np.power(self.container.wave_lengths, 5) / c_1)
+        x = c_2 / self.container.wave_lengths
+        a, _ = np.polyfit(x, y, deg=1)
+        return float(-1 / a)
+    
     def j_matrix_t(self, temp: float) -> npt.NDArray[np.float64]:
         """To find eps_arr, not for covariance matrix"""
         return np.array(
@@ -175,7 +184,7 @@ class Calculator:
 
 def calculate_temp_with_errors(spec_container: SpecContainer)->tuple[list[float], list[float]]:
     calculator = Calculator(spec_container)
-    t_vin = spec_container.estimate_vin()
+    t_vin = calculator.estimate_vin()
     t_0 = float(minimize(calculator.s2, t_vin, method="Nelder-Mead").x[0]) # type: ignore
     eps = calculator.eps_arr(t_0)
     ans_arr = [t_0]+list(eps)

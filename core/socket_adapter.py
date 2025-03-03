@@ -13,7 +13,7 @@ def recieve_signal(client_socket: socket) -> Sequence[float]:
             break
         binary_data += part
     if len(binary_data) == expected_length:
-        signals = [float(x) for x in struct.unpack(f"!{array_size}l", binary_data)]
+        signals = [float(x) for x in struct.unpack(f"@{array_size}l", binary_data)]
         return signals
     else:
         raise ValueError("Incorrect package size. Expected length: {}, got {}".format(expected_length, len(binary_data)))
