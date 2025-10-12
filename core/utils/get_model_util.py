@@ -6,7 +6,7 @@ from core.interfaces import SpecContainerProtocol
 class GetModelMixin(SpecContainerProtocol):
     def get_model(self)->tuple[tuple[int, ...], tuple[float, ...]]:
         eps_arr = [self.e0_var.get()]
-        eps_model = [self.e0_var.get()]
+        eps_model = [0]
         if self.e1_check_var.get():
             eps_arr.append(self.e1_var.get())
             eps_model.append(1)
